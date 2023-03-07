@@ -1,0 +1,12 @@
+{
+  "name": "tree-sitter-blade",
+  "version": "0.0.1",
+  "description": "A TS grammar for Laravel Blade templating language (WIP)",
+  "main": "bindings/node",
+  "author": "Karan Ahlawat",
+  "license": "GPLv3",
+  "private": false,
+  "dependencies": {
+    "nan": "^2.17.0"
+  }
+}
