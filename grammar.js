@@ -18,7 +18,7 @@ module.exports = grammar(html, {
   name: "blade",
   externals: ($, original) => [
     ...original,
-    ...echo_closing_tags  
+    $.raw_echo_php
   ],
   rules: {
     _node: ($, original) => choice(
@@ -28,7 +28,7 @@ module.exports = grammar(html, {
 
     echo_statement: $ => seq(
       alias($.echo_start_tag, $.start_tag),
-      optional($.raw_text),
+      optional($.raw_echo_php),
       alias($.echo_end_tag, $.end_tag)
     ),
 

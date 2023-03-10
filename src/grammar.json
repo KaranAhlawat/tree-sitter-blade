@@ -461,32 +461,8 @@
           "type": "CHOICE",
           "members": [
             {
-              "type": "PATTERN",
-              "value": "\\s*"
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
               "type": "SYMBOL",
-              "name": "raw_text"
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "PATTERN",
-              "value": "\\s*"
+              "name": "raw_echo_php"
             },
             {
               "type": "BLANK"
@@ -626,12 +602,8 @@
       "name": "comment"
     },
     {
-      "type": "STRING",
-      "value": "}}"
-    },
-    {
-      "type": "STRING",
-      "value": "!!}"
+      "type": "SYMBOL",
+      "name": "raw_echo_php"
     }
   ],
   "inline": [],

@@ -1,0 +1,30 @@
+================================
+Mixed Raw Echo PHP and Raw Text
+================================
+
+<div>
+    {{ !user->age > 18 }}
+    <script>
+        let a = 10;
+        console.log(a);
+    </script>
+</div>
+
+---
+
+(fragment
+    (element
+        (start_tag
+            (tag_name))
+        (echo_statement
+            (start_tag)
+            (raw_echo_php)
+            (end_tag))
+        (script_element
+            (start_tag
+                (tag_name))
+            (raw_text)
+            (end_tag
+                (tag_name)))
+        (end_tag
+            (tag_name))))

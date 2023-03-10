@@ -40,7 +40,7 @@
           "named": true
         },
         {
-          "type": "raw_text",
+          "type": "raw_echo_php",
           "named": true
         },
         {
@@ -323,6 +323,10 @@
   },
   {
     "type": "erroneous_end_tag_name",
+    "named": true
+  },
+  {
+    "type": "raw_echo_php",
     "named": true
   },
   {

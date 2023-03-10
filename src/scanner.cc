@@ -4,6 +4,7 @@
 #include <string>
 #include <cwctype>
 #include <cstring>
+#include <iostream>
 #include "tag.h"
 
 // Some helper macros
@@ -30,8 +31,7 @@ enum TokenType {
   IMPLICIT_END_TAG,
   RAW_TEXT,
   COMMENT,
-  ECHO_CLOSE_REGULAR_DELIMITER,
-  ECHO_CLOSE_RAW_DELIMITER
+  RAW_ECHO_PHP
 };
 
 struct Scanner {
@@ -128,45 +128,59 @@ struct Scanner {
     return false;
   }
 
-  bool scan_raw_text(TSLexer *lexer, const bool *valid_symbols) {
-    if (!(SYM(ECHO_CLOSE_REGULAR_DELIMITER) || SYM(ECHO_CLOSE_RAW_DELIMITER))) {
-      if (!tags.size()) return false;
+  bool scan_raw_text(TSLexer *lexer) {
+    if (!tags.size()) return false;
 
-      lexer->mark_end(lexer);
+    lexer->mark_end(lexer);
 
-      const string &end_delimiter = tags.back().type == SCRIPT
-        ? "</SCRIPT"
-        : "</STYLE";
+    const string &end_delimiter = tags.back().type == SCRIPT
+      ? "</SCRIPT"
+      : "</STYLE";
 
-      unsigned delimiter_index = 0;
-      while (lexer->lookahead) {
-        if (towupper(lexer->lookahead) == end_delimiter[delimiter_index]) {
-          delimiter_index++;
-          if (delimiter_index == end_delimiter.size()) break;
-          lexer->advance(lexer, false);
-        } else {
-          delimiter_index = 0;
-          lexer->advance(lexer, false);
-          lexer->mark_end(lexer);
-        }
-      }
-
-      lexer->result_symbol = RAW_TEXT;
-      return true;
-    } else {
-      S_MARK_END;
-      unsigned delimiter_len = valid_symbols[ECHO_CLOSE_RAW_DELIMITER] ? 3 : 2;
-
-      for (unsigned i = 0; i < delimiter_len; ++i) {
+    unsigned delimiter_index = 0;
+    while (lexer->lookahead) {
+      if (towupper(lexer->lookahead) == end_delimiter[delimiter_index]) {
+        delimiter_index++;
+        if (delimiter_index == end_delimiter.size()) break;
         lexer->advance(lexer, false);
+      } else {
+        delimiter_index = 0;
+        lexer->advance(lexer, false);
+        lexer->mark_end(lexer);
       }
-
-      lexer->result_symbol = valid_symbols[ECHO_CLOSE_RAW_DELIMITER]
-        ? ECHO_CLOSE_RAW_DELIMITER
-        : ECHO_CLOSE_REGULAR_DELIMITER;
-
-      return true;
     }
+
+    lexer->result_symbol = RAW_TEXT;
+    return true;
+  }
+
+  bool scan_raw_php(TSLexer *lexer) {
+    S_MARK_END;
+
+    while (PEEK) {
+      if (towupper(PEEK) == '}') {
+        S_ADVANCE;
+        if (towupper(PEEK) == '}') {
+          S_ADVANCE;
+          break;
+        }
+      } else if (towupper(PEEK) == '!') {
+        S_ADVANCE;
+        if (towupper(PEEK) == '!') {
+          S_ADVANCE;
+          if (towupper(PEEK) == '}') {
+            S_ADVANCE;
+            break;
+          }
+        }
+      } else {
+        S_ADVANCE;
+        S_MARK_END;
+      }
+    }
+
+    S_RESULT(RAW_ECHO_PHP);
+    return true;
   }
 
   bool scan_implicit_end_tag(TSLexer *lexer) {
@@ -254,45 +268,17 @@ struct Scanner {
     return false;
   }
 
-  bool scan_echo_close_regular_delimiter(TSLexer *lexer) {
-    S_MARK_END;
-    if (PEEK != '}') return false;
-    S_ADVANCE;
-    if (PEEK != '}') return false;
-    S_ADVANCE;
-
-    S_RESULT(ECHO_CLOSE_REGULAR_DELIMITER);
-    return true;
-  }
-
-  bool scan_echo_close_raw_delimiter(TSLexer *lexer) {
-    if (PEEK != '!') return false;
-    S_ADVANCE;
-    if (PEEK != '!') return false;
-    S_ADVANCE;
-    if (PEEK != '}') return false;
-    S_ADVANCE;
-
-    S_RESULT(ECHO_CLOSE_RAW_DELIMITER);
-    return true;
-  }
-
   bool scan(TSLexer *lexer, const bool *valid_symbols) {
     while (iswspace(lexer->lookahead)) {
       lexer->advance(lexer, true);
     }
 
-    if (valid_symbols[RAW_TEXT] && !valid_symbols[START_TAG_NAME] && !valid_symbols[END_TAG_NAME]
-        && !SYM(ECHO_CLOSE_REGULAR_DELIMITER) && !SYM(ECHO_CLOSE_RAW_DELIMITER)) {
-      return scan_raw_text(lexer, valid_symbols);
+    if (valid_symbols[RAW_TEXT] && !valid_symbols[START_TAG_NAME] && !valid_symbols[END_TAG_NAME]) {
+      return scan_raw_text(lexer);
     }
 
-    if (SYM(ECHO_CLOSE_RAW_DELIMITER)) {
-      return scan_echo_close_raw_delimiter(lexer);
-    }
-
-    if (SYM(ECHO_CLOSE_REGULAR_DELIMITER)) {
-      return scan_echo_close_regular_delimiter(lexer);
+    if (SYM(RAW_ECHO_PHP)) {
+      return scan_raw_php(lexer);
     }
 
     switch (lexer->lookahead) {
