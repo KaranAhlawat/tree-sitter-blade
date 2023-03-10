@@ -6,7 +6,7 @@ const html = require("./tree-sitter-html/grammar");
 const echo_opening_tags = [
   "{{", // regular
   "{!!", // raw
-  "@{{" // escaped
+  "@{{", //verabtim
 ]
 
 const echo_closing_tags = [
@@ -32,12 +32,7 @@ module.exports = grammar(html, {
       alias($.echo_end_tag, $.end_tag)
     ),
 
-    echo_start_tag: $ => token(prec(1,
-      choice(
-        seq('@', token.immediate(choice(...echo_opening_tags))),
-        choice(...echo_opening_tags)
-      )
-    )),
+    echo_start_tag: $ => choice(...echo_opening_tags.map(tag => token(prec(1, tag)))),
 
     echo_end_tag: $ => choice(...echo_closing_tags)
   }

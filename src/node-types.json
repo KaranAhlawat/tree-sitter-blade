@@ -306,6 +306,10 @@
     "named": false
   },
   {
+    "type": "@{{",
+    "named": false
+  },
+  {
     "type": "attribute_name",
     "named": true
   },
@@ -340,6 +344,14 @@
   {
     "type": "text",
     "named": true
+  },
+  {
+    "type": "{!!",
+    "named": false
+  },
+  {
+    "type": "{{",
+    "named": false
   },
   {
     "type": "}}",

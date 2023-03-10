@@ -481,62 +481,42 @@
       ]
     },
     "echo_start_tag": {
-      "type": "TOKEN",
-      "content": {
-        "type": "PREC",
-        "value": 1,
-        "content": {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "STRING",
-                  "value": "@"
-                },
-                {
-                  "type": "IMMEDIATE_TOKEN",
-                  "content": {
-                    "type": "CHOICE",
-                    "members": [
-                      {
-                        "type": "STRING",
-                        "value": "{{"
-                      },
-                      {
-                        "type": "STRING",
-                        "value": "{!!"
-                      },
-                      {
-                        "type": "STRING",
-                        "value": "@{{"
-                      }
-                    ]
-                  }
-                }
-              ]
-            },
-            {
-              "type": "CHOICE",
-              "members": [
-                {
-                  "type": "STRING",
-                  "value": "{{"
-                },
-                {
-                  "type": "STRING",
-                  "value": "{!!"
-                },
-                {
-                  "type": "STRING",
-                  "value": "@{{"
-                }
-              ]
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "TOKEN",
+          "content": {
+            "type": "PREC",
+            "value": 1,
+            "content": {
+              "type": "STRING",
+              "value": "{{"
             }
-          ]
+          }
+        },
+        {
+          "type": "TOKEN",
+          "content": {
+            "type": "PREC",
+            "value": 1,
+            "content": {
+              "type": "STRING",
+              "value": "{!!"
+            }
+          }
+        },
+        {
+          "type": "TOKEN",
+          "content": {
+            "type": "PREC",
+            "value": 1,
+            "content": {
+              "type": "STRING",
+              "value": "@{{"
+            }
+          }
         }
-      }
+      ]
     },
     "echo_end_tag": {
       "type": "CHOICE",

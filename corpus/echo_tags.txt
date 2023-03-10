@@ -24,11 +24,16 @@ Multiple Echo Tags
 ====================
 
 {{ $code }}
-{!! !code !!}
+{!! !$code !!}
+@{{ method_call() }}
 
 ---
 
 (fragment
+  (echo_statement
+    (start_tag)
+    (raw_echo_php)
+    (end_tag))
   (echo_statement
     (start_tag)
     (raw_echo_php)
