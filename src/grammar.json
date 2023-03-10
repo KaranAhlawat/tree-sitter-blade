@@ -43,27 +43,36 @@
       "members": [
         {
           "type": "SYMBOL",
-          "name": "doctype"
+          "name": "echo_statement"
         },
         {
-          "type": "SYMBOL",
-          "name": "text"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "element"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "script_element"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "style_element"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "erroneous_end_tag"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "doctype"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "text"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "element"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "script_element"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "style_element"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "erroneous_end_tag"
+            }
+          ]
         }
       ]
     },
@@ -435,6 +444,136 @@
     "text": {
       "type": "PATTERN",
       "value": "[^<>\\s]([^<>]*[^<>\\s])?"
+    },
+    "echo_statement": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "echo_start_tag"
+          },
+          "named": true,
+          "value": "start_tag"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "PATTERN",
+              "value": "\\s*"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "raw_text"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "PATTERN",
+              "value": "\\s*"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "echo_end_tag"
+          },
+          "named": true,
+          "value": "end_tag"
+        }
+      ]
+    },
+    "echo_start_tag": {
+      "type": "TOKEN",
+      "content": {
+        "type": "PREC",
+        "value": 1,
+        "content": {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "@"
+                },
+                {
+                  "type": "IMMEDIATE_TOKEN",
+                  "content": {
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "STRING",
+                        "value": "{{"
+                      },
+                      {
+                        "type": "STRING",
+                        "value": "{!!"
+                      },
+                      {
+                        "type": "STRING",
+                        "value": "@{{"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "{{"
+                },
+                {
+                  "type": "STRING",
+                  "value": "{!!"
+                },
+                {
+                  "type": "STRING",
+                  "value": "@{{"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "echo_end_tag": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "}}"
+        },
+        {
+          "type": "STRING",
+          "value": "!!}"
+        }
+      ]
     }
   },
   "extras": [
@@ -485,6 +624,14 @@
     {
       "type": "SYMBOL",
       "name": "comment"
+    },
+    {
+      "type": "STRING",
+      "value": "}}"
+    },
+    {
+      "type": "STRING",
+      "value": "!!}"
     }
   ],
   "inline": [],

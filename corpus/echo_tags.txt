@@ -1,0 +1,19 @@
+====================
+Echo Tags
+====================
+
+<div>
+  {{ $code }}
+</div>
+
+---
+
+(fragment
+  (element
+    (start_tag
+      (tag_name))
+    (echo_statement
+      (start_tag)
+      (end_tag))
+    (end_tag
+      (tag_name))))

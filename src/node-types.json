@@ -28,6 +28,29 @@
     "fields": {}
   },
   {
+    "type": "echo_statement",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "end_tag",
+          "named": true
+        },
+        {
+          "type": "raw_text",
+          "named": true
+        },
+        {
+          "type": "start_tag",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "element",
     "named": true,
     "fields": {},
@@ -37,6 +60,10 @@
       "types": [
         {
           "type": "doctype",
+          "named": true
+        },
+        {
+          "type": "echo_statement",
           "named": true
         },
         {
@@ -80,7 +107,7 @@
     "fields": {},
     "children": {
       "multiple": false,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "tag_name",
@@ -114,6 +141,10 @@
       "types": [
         {
           "type": "doctype",
+          "named": true
+        },
+        {
+          "type": "echo_statement",
           "named": true
         },
         {
@@ -202,7 +233,7 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "attribute",
@@ -237,6 +268,10 @@
         }
       ]
     }
+  },
+  {
+    "type": "!!}",
+    "named": false
   },
   {
     "type": "\"",
@@ -301,5 +336,9 @@
   {
     "type": "text",
     "named": true
+  },
+  {
+    "type": "}}",
+    "named": false
   }
 ]
