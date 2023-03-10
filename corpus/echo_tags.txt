@@ -14,7 +14,7 @@ Echo Tags
       (tag_name))
     (echo_statement
       (start_tag)
-      (raw_php)
+      (raw_echo_php)
       (end_tag))
     (end_tag
       (tag_name))))
@@ -31,9 +31,9 @@ Multiple Echo Tags
 (fragment
   (echo_statement
     (start_tag)
-    (raw_php)
+    (raw_echo_php)
     (end_tag))
   (echo_statement
     (start_tag)
-    (raw_php)
+    (raw_echo_php)
     (end_tag)))
