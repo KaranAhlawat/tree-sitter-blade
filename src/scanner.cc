@@ -16,6 +16,7 @@
 #define S_EOF lexer->eof(lexer)
 #define SYM(s) (valid_symbols[s])
 
+
 namespace {
 
 using std::vector;
@@ -31,8 +32,21 @@ enum TokenType {
   IMPLICIT_END_TAG,
   RAW_TEXT,
   COMMENT,
-  RAW_ECHO_PHP
+  TEXT,
+  RAW_ECHO_PHP,
+  ECHO_TAG_REGULAR_DELIMITER,
+  ECHO_TAG_VERBATIM_DELIMITER,
+  END
 };
+
+void print_valid_syms(const bool *valid_symbols) {
+    auto a = (unsigned)TokenType::END;
+    std::cerr << "\nVS: START\n";
+    for (unsigned i = 0; i <= a; ++i) {
+      std::cerr << valid_symbols[i] << " ";
+    }
+    std::cerr << "\nVS: END\n";
+}
 
 struct Scanner {
   Scanner() {}
@@ -268,6 +282,137 @@ struct Scanner {
     return false;
   }
 
+  bool check_open_echo_delimiter(TSLexer *lexer, bool is_verabtim) {
+    // {{, @{{, {!!
+    if (S_EOF || !PEEK) return false;
+    if (is_verabtim) {
+      if (PEEK != '@') return false;
+      S_ADVANCE;
+      if (PEEK != '{') return false;
+      S_ADVANCE;
+      if (PEEK != '{') return false;
+      S_ADVANCE;
+    } else {
+      if (PEEK != '{') return false;
+      S_ADVANCE;
+      if (PEEK != '{' && PEEK != '!') return false;
+      if (PEEK == '{') {
+        S_ADVANCE;
+        return true;
+      }
+      S_ADVANCE;
+      if (PEEK != '!') return false;
+      S_ADVANCE;
+    }
+
+    return true;
+  }
+
+  bool scan_open_echo_delimiter(TSLexer *lexer, bool is_verbatim) {
+    if (!check_open_echo_delimiter(lexer, is_verbatim)) return false;
+    if (is_verbatim) S_RESULT(ECHO_TAG_VERBATIM_DELIMITER)
+    else S_RESULT(ECHO_TAG_REGULAR_DELIMITER);
+    return true;
+  }
+
+  bool scan_text(TSLexer *lexer) {
+    // check if we have anything valid to scan
+    if (S_EOF || !PEEK) return false;
+    S_MARK_END;
+
+    // [^<>\s]
+    if (PEEK == '<' || PEEK == '>'
+     || PEEK == ' ') {
+      return false;
+    }
+
+    if (PEEK == '{') {
+      S_MARK_END;
+      if (check_open_echo_delimiter(lexer, false)) {
+        return false;
+      }
+    }
+
+    if (PEEK == '@') {
+      S_MARK_END;
+      if (check_open_echo_delimiter(lexer, true)) {
+        return false;
+      }
+    }
+
+    S_ADVANCE;
+
+    // Takes care of the optional
+    if (S_EOF || !PEEK) {
+      S_MARK_END;
+      S_RESULT(TEXT);
+      return true;
+    }
+
+    // [^<>]*
+    while (!S_EOF && PEEK) {
+      if (PEEK == '<'
+       || PEEK == '>') {
+        break;
+       }
+
+      if (PEEK == '{') {
+        S_MARK_END;
+        if (check_open_echo_delimiter(lexer, false)) {
+          S_RESULT(TEXT);
+          return true;
+        }
+      }
+
+      if (PEEK == '@') {
+        S_MARK_END;
+        if (check_open_echo_delimiter(lexer, true)) {
+          S_RESULT(TEXT);
+          return true;
+        }
+      }
+      S_ADVANCE;
+    }
+
+    if (S_EOF || !PEEK) {
+      S_MARK_END;
+      S_RESULT(TEXT);
+      return true;
+    }
+
+    if (!S_EOF && PEEK) {
+      if (PEEK == '<'
+       || PEEK == '>'
+       || PEEK == ' ') {
+        S_MARK_END;
+        S_RESULT(TEXT);
+        return true;
+       }
+
+      if (PEEK == '{') {
+        S_MARK_END;
+        if (check_open_echo_delimiter(lexer, false)) {
+          S_RESULT(TEXT);
+          return true;
+        }
+      }
+
+      if (PEEK == '@') {
+        S_MARK_END;
+        if (check_open_echo_delimiter(lexer, true)) {
+          S_RESULT(TEXT);
+          return true;
+        }
+      }
+
+      S_ADVANCE;
+    }
+
+    S_MARK_END;
+    S_RESULT(TEXT);
+    return true;
+  }
+
   bool scan(TSLexer *lexer, const bool *valid_symbols) {
     while (iswspace(lexer->lookahead)) {
       lexer->advance(lexer, true);
@@ -308,7 +453,21 @@ struct Scanner {
         }
         break;
 
+      case '{':
+      case '@':
+        if (SYM(ECHO_TAG_REGULAR_DELIMITER)) {
+          return scan_open_echo_delimiter(lexer, false);
+        }
+        if (SYM(ECHO_TAG_VERBATIM_DELIMITER)) {
+          return scan_open_echo_delimiter(lexer, true);
+        }
+        break;
+
       default:
+        if (valid_symbols[TEXT]) {
+          return scan_text(lexer);
+        }
+
         if ((valid_symbols[START_TAG_NAME] || valid_symbols[END_TAG_NAME]) && !valid_symbols[RAW_TEXT]) {
           return valid_symbols[START_TAG_NAME]
             ? scan_start_tag_name(lexer)

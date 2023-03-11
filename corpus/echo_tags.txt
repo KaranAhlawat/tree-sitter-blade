@@ -42,3 +42,30 @@ Multiple Echo Tags
     (start_tag)
     (raw_echo_php)
     (end_tag)))
+
+=======================
+Echos and Text Mixed
+=======================
+
+This {{ $code }}
+does {bruh} {!! !$code !!}
+work @{{ method_call() }}
+
+---
+
+(fragment
+  (text)
+  (echo_statement
+    (start_tag)
+    (raw_echo_php)
+    (end_tag))
+  (text)
+  (echo_statement
+    (start_tag)
+    (raw_echo_php)
+    (end_tag))
+  (text)
+  (echo_statement
+    (start_tag)
+    (raw_echo_php)
+    (end_tag)))

@@ -583,7 +583,19 @@
     },
     {
       "type": "SYMBOL",
+      "name": "text"
+    },
+    {
+      "type": "SYMBOL",
       "name": "raw_echo_php"
+    },
+    {
+      "type": "STRING",
+      "value": "{"
+    },
+    {
+      "type": "STRING",
+      "value": "@"
     }
   ],
   "inline": [],
