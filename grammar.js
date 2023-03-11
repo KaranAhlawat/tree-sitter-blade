@@ -16,9 +16,13 @@ const echo_closing_tags = [
 
 module.exports = grammar(html, {
   name: "blade",
+
   externals: ($, original) => [
     ...original,
-    $.raw_echo_php
+    $.text,
+    $.raw_echo_php,
+    '{',
+    '@'
   ],
   rules: {
     _node: ($, original) => choice(

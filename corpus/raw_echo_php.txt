@@ -3,11 +3,12 @@ Mixed Raw Echo PHP and Raw Text
 ================================
 
 <div>
-    {{ !($user->age > 18) }}
+    Testing {testing} {{ !($user->age > 18) }}
     <script>
         let a = 10;
         console.log(a);
     </script>
+    Some more text!
 </div>
 
 ---
@@ -16,6 +17,7 @@ Mixed Raw Echo PHP and Raw Text
     (element
         (start_tag
             (tag_name))
+        (text)
         (echo_statement
             (start_tag)
             (raw_echo_php)
@@ -26,5 +28,6 @@ Mixed Raw Echo PHP and Raw Text
             (raw_text)
             (end_tag
                 (tag_name)))
+        (text)
         (end_tag
             (tag_name))))
